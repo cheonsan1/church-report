@@ -133,9 +133,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">주간 대시보드</h1>
-        <p className="text-slate-500">제출된 사역 보고 현황 및 통계입니다.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">주간 대시보드</h1>
+          <p className="text-slate-500">제출된 사역 보고 현황 및 통계입니다.</p>
+        </div>
+        <Button variant="outline" onClick={() => window.location.href = '/dashboard/reports'}>
+          전체 보고서 보기
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
