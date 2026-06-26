@@ -78,6 +78,15 @@ export default function AdminPage() {
     else fetchData();
   };
 
+  const handleDeleteDepartment = async (id: string, name: string) => {
+    const confirm = window.confirm(`정말 '${name}' 부서를 삭제하시겠습니까?\n이 부서에 소속된 명단과 보고서가 모두 삭제될 수 있습니다.`);
+    if (!confirm) return;
+
+    const { error } = await supabase.from("departments").delete().eq("id", id);
+    if (error) alert("삭제 실패: " + error.message);
+    else fetchData();
+  };
+
   // === 성도 관련 함수 ===
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,9 +179,14 @@ export default function AdminPage() {
                   {departments.filter(d => d.type === 'sunday_school').map(dept => (
                     <div key={dept.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-md border border-transparent hover:border-slate-100 transition-colors">
                       <span className="text-sm">{dept.name}</span>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs text-slate-500" onClick={() => handleEditDepartment(dept.id, dept.name)}>
-                        <Edit2 className="w-3 h-3 mr-1" /> 수정
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-slate-500" onClick={() => handleEditDepartment(dept.id, dept.name)}>
+                          <Edit2 className="w-3 h-3" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDeleteDepartment(dept.id, dept.name)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -190,9 +204,14 @@ export default function AdminPage() {
                   {departments.filter(d => d.type === 'parish').map(dept => (
                     <div key={dept.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-md border border-transparent hover:border-slate-100 transition-colors">
                       <span className="text-sm">{dept.name}</span>
-                      <Button variant="ghost" size="sm" className="h-8 text-xs text-slate-500" onClick={() => handleEditDepartment(dept.id, dept.name)}>
-                        <Edit2 className="w-3 h-3 mr-1" /> 수정
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-slate-500" onClick={() => handleEditDepartment(dept.id, dept.name)}>
+                          <Edit2 className="w-3 h-3" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDeleteDepartment(dept.id, dept.name)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
