@@ -14,6 +14,9 @@ export function Header() {
           <Link href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">
             대시보드
           </Link>
+          <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">
+            관리자(설정)
+          </Link>
         </nav>
       </div>
     </header>
