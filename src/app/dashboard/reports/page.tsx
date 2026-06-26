@@ -117,7 +117,7 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-4 border-b pb-4">
-        <Button variant="ghost" size="icon" onClick={() => window.location.href = '/dashboard'}>
+        <Button variant="ghost" size="sm" onClick={() => window.location.href = '/dashboard'}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
