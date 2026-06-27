@@ -28,11 +28,18 @@ export default function AdminPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchDeptId, setSearchDeptId] = useState("all");
 
   // 새 성도 추가용 상태
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberArea, setNewMemberArea] = useState("");
   const [newMemberDeptId, setNewMemberDeptId] = useState("");
+
+  // 성도 수정용 상태
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
+  const [editMemberName, setEditMemberName] = useState("");
+  const [editMemberArea, setEditMemberArea] = useState("");
+  const [editMemberDeptId, setEditMemberDeptId] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -119,7 +126,38 @@ export default function AdminPage() {
     else fetchData();
   };
 
-  const filteredMembers = members.filter(m => m.name.includes(searchQuery));
+  const startEditMember = (member: Member) => {
+    setEditingMemberId(member.id);
+    setEditMemberName(member.name);
+    setEditMemberArea(member.area);
+    setEditMemberDeptId(member.department_id);
+  };
+
+  const handleUpdateMember = async (id: string) => {
+    if (!editMemberDeptId || !editMemberArea || !editMemberName) {
+      alert("교구, 구역, 이름을 모두 입력해주세요.");
+      return;
+    }
+
+    const { error } = await supabase.from("members").update({
+      department_id: editMemberDeptId,
+      area: editMemberArea,
+      name: editMemberName
+    }).eq("id", id);
+
+    if (error) {
+      alert("수정 실패: " + error.message);
+    } else {
+      setEditingMemberId(null);
+      fetchData();
+    }
+  };
+
+  const filteredMembers = members.filter(m => {
+    const matchesName = m.name.includes(searchQuery);
+    const matchesDept = searchDeptId === "all" || m.department_id === searchDeptId;
+    return matchesName && matchesDept;
+  });
 
   if (!isAuthenticated) {
     return (
@@ -263,6 +301,15 @@ export default function AdminPage() {
 
             {/* 검색 및 리스트 */}
             <div className="flex gap-2 mb-4">
+              <Select 
+                className="w-32"
+                value={searchDeptId}
+                onChange={e => setSearchDeptId(e.target.value)}
+                options={[
+                  { label: "전체 교구", value: "all" },
+                  ...departments.filter(d => d.type === 'parish').map(d => ({ label: d.name, value: d.id }))
+                ]}
+              />
               <Input 
                 placeholder="이름으로 검색..." 
                 className="flex-1" 
@@ -274,20 +321,61 @@ export default function AdminPage() {
             <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 flex-1">
               {filteredMembers.map(member => (
                 <div key={member.id} className="flex items-center justify-between p-3 border border-slate-100 rounded-md bg-white hover:border-slate-300 transition-colors">
-                  <div>
-                    <div className="font-medium text-sm">{member.name}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">
-                      {departments.find(d => d.id === member.department_id)?.name || '알수없음'} / {member.area}구역
+                  {editingMemberId === member.id ? (
+                    <div className="flex flex-col w-full gap-2">
+                      <div className="flex gap-2">
+                        <Select 
+                          className="flex-1"
+                          value={editMemberDeptId}
+                          onChange={e => setEditMemberDeptId(e.target.value)}
+                          options={departments.filter(d => d.type === 'parish').map(d => ({ label: d.name, value: d.id }))}
+                        />
+                        <Input 
+                          className="w-20"
+                          placeholder="구역" 
+                          value={editMemberArea}
+                          onChange={e => setEditMemberArea(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Input 
+                          className="flex-1"
+                          placeholder="이름 입력" 
+                          value={editMemberName}
+                          onChange={e => setEditMemberName(e.target.value)}
+                        />
+                        <Button size="sm" onClick={() => handleUpdateMember(member.id)}>저장</Button>
+                        <Button size="sm" variant="outline" onClick={() => setEditingMemberId(null)}>취소</Button>
+                      </div>
                     </div>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
-                    onClick={() => handleDeleteMember(member.id, member.name)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  ) : (
+                    <>
+                      <div>
+                        <div className="font-medium text-sm">{member.name}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">
+                          {departments.find(d => d.id === member.department_id)?.name || '알수없음'} / {member.area}구역
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 px-2 text-xs text-slate-500"
+                          onClick={() => startEditMember(member)}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => handleDeleteMember(member.id, member.name)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
               
