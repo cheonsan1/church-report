@@ -37,6 +37,7 @@ export default function ParishReport() {
   const [selectedArea, setSelectedArea] = useState("");
   const [attendances, setAttendances] = useState<Record<string, AttendanceRecord>>({});
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     async function fetchDepartments() {
@@ -140,7 +141,8 @@ export default function ParishReport() {
         department_id: selectedDept,
         area: selectedArea,
         report_date: reportDate,
-        author: author
+        author: author,
+        password: password
       })
       .select('id')
       .single();
@@ -339,6 +341,21 @@ export default function ParishReport() {
                   ))}
                 </div>
               )}
+            </div>
+
+            <div className="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <label className="text-sm font-semibold flex items-center text-slate-700">
+                비밀번호 (수정/삭제용)
+              </label>
+              <p className="text-xs text-slate-500 mb-2">추후 보고서를 수정하거나 삭제할 때 필요한 비밀번호(숫자 4자리 등)를 입력해주세요.</p>
+              <Input 
+                type="password" 
+                placeholder="비밀번호 입력" 
+                required 
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="max-w-[200px]"
+              />
             </div>
 
             <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>

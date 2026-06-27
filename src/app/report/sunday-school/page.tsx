@@ -26,6 +26,7 @@ export default function SundaySchoolReport() {
   const [attTeacher, setAttTeacher] = useState("0");
   const [attNewcomer, setAttNewcomer] = useState("0");
   const [ministryReport, setMinistryReport] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     async function fetchDepartments() {
@@ -59,7 +60,8 @@ export default function SundaySchoolReport() {
         attendance_student: parseInt(attStudent) || 0,
         attendance_teacher: parseInt(attTeacher) || 0,
         attendance_newcomer: parseInt(attNewcomer) || 0,
-        ministry_report: ministryReport
+        ministry_report: ministryReport,
+        password: password
       });
 
     setIsSubmitting(false);
@@ -151,6 +153,21 @@ export default function SundaySchoolReport() {
                 required 
                 value={ministryReport}
                 onChange={e => setMinistryReport(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <label className="text-sm font-semibold flex items-center text-slate-700">
+                비밀번호 (수정/삭제용)
+              </label>
+              <p className="text-xs text-slate-500 mb-2">추후 보고서를 수정하거나 삭제할 때 필요한 비밀번호(숫자 4자리 등)를 입력해주세요.</p>
+              <Input 
+                type="password" 
+                placeholder="비밀번호 입력" 
+                required 
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="max-w-[200px]"
               />
             </div>
 

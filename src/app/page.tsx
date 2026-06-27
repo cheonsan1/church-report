@@ -8,7 +8,7 @@ import { Users, UsersRound, CheckCircle, Clock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function Home() {
-  const [recentSubmissions, setRecentSubmissions] = useState<{name: string, type: string, time: string}[]>([]);
+  const [recentSubmissions, setRecentSubmissions] = useState<{id: string, name: string, type: string, time: string}[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -21,25 +21,27 @@ export default function Home() {
         const [ssRes, parishRes] = await Promise.all([
           supabase
             .from("sunday_school_reports")
-            .select("created_at, departments(name)")
+            .select("id, created_at, departments(name)")
             .gte("created_at", dateString)
             .order("created_at", { ascending: false }),
           supabase
             .from("parish_reports")
-            .select("created_at, area, departments(name)")
+            .select("id, created_at, area, departments(name)")
             .gte("created_at", dateString)
             .order("created_at", { ascending: false })
         ]);
 
         const ssData = (ssRes.data || []).map((d: any) => ({
+          id: d.id,
           name: d.departments?.name || '알 수 없음',
-          type: '주일학교',
+          type: 'sunday-school',
           time: d.created_at
         }));
 
         const parishData = (parishRes.data || []).map((d: any) => ({
+          id: d.id,
           name: `${d.departments?.name || '알 수 없음'} ${d.area}구역`,
-          type: '교구',
+          type: 'parish',
           time: d.created_at
         }));
 
@@ -105,16 +107,18 @@ export default function Home() {
                 const formattedDate = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
                 
                 return (
-                  <li key={idx} className="flex items-center justify-between p-3 hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center">
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full mr-3 ${
-                        sub.type === '주일학교' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-                      }`}>
-                        {sub.type}
-                      </span>
-                      <span className="font-medium text-sm text-slate-800">{sub.name}</span>
-                    </div>
-                    <span className="text-xs text-slate-400">{formattedDate}</span>
+                  <li key={idx} className="hover:bg-slate-50 transition-colors">
+                    <Link href={`/report/edit?type=${sub.type}&id=${sub.id}`} className="flex items-center justify-between p-3 w-full">
+                      <div className="flex items-center">
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full mr-3 ${
+                          sub.type === 'sunday-school' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                        }`}>
+                          {sub.type === 'sunday-school' ? '주일학교' : '교구'}
+                        </span>
+                        <span className="font-medium text-sm text-slate-800">{sub.name}</span>
+                      </div>
+                      <span className="text-xs text-slate-400">{formattedDate}</span>
+                    </Link>
                   </li>
                 );
               })}

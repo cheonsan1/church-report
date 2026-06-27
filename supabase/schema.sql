@@ -29,6 +29,7 @@ CREATE TABLE sunday_school_reports (
   attendance_teacher INTEGER DEFAULT 0,
   attendance_newcomer INTEGER DEFAULT 0,
   ministry_report TEXT, -- 주간사역보고
+  password TEXT, -- 보고서 수정/삭제용 비밀번호
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -39,6 +40,7 @@ CREATE TABLE parish_reports (
   area TEXT NOT NULL,
   report_date DATE NOT NULL,
   author TEXT, -- 작성자
+  password TEXT, -- 보고서 수정/삭제용 비밀번호
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
